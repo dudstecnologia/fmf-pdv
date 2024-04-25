@@ -1,13 +1,18 @@
 package com.fmf.pdv;
 
+import com.fmf.pdv.dao.LoginDAO;
+import com.fmf.pdv.dto.LoginDTO;
 import com.fmf.pdv.util.DbDAO;
+import javax.swing.JOptionPane;
 
 public class LoginScreen extends javax.swing.JFrame {
     private DbDAO dbDAO;
+    private LoginDAO loginDAO;
 
     public LoginScreen() {
         initComponents();
         dbDAO = new DbDAO();
+        loginDAO = new LoginDAO();
 
         dbDAO.createTables();
     }
@@ -28,8 +33,8 @@ public class LoginScreen extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jPasswordField1 = new javax.swing.JPasswordField();
+        editUsername = new javax.swing.JTextField();
+        editPassword = new javax.swing.JPasswordField();
         btnExit = new javax.swing.JButton();
         btnLogin = new javax.swing.JButton();
 
@@ -88,11 +93,11 @@ public class LoginScreen extends javax.swing.JFrame {
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel5.setText("Senha");
 
-        jTextField1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        editUsername.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        editUsername.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jPasswordField1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
-        jPasswordField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        editPassword.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        editPassword.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         btnExit.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         btnExit.setText("Sair");
@@ -124,8 +129,8 @@ public class LoginScreen extends javax.swing.JFrame {
                             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField1)
-                            .addComponent(jPasswordField1, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)))
+                            .addComponent(editUsername)
+                            .addComponent(editPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
@@ -139,11 +144,11 @@ public class LoginScreen extends javax.swing.JFrame {
                 .addGap(166, 166, 166)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(editUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(editPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnExit)
@@ -171,10 +176,16 @@ public class LoginScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_btnExitActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        this.setVisible(false);
+        LoginDTO loginDTO = loginDAO.login(editUsername.getText(), new String(editPassword.getPassword()));
 
-        MainScreen mainScreen = new MainScreen();
-        mainScreen.setVisible(true);
+        if (loginDTO.isSuccess()) {
+            this.setVisible(false);
+
+            MainScreen mainScreen = new MainScreen(loginDTO.getUser());
+            mainScreen.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Credenciais inválidos");
+        }
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
@@ -215,6 +226,8 @@ public class LoginScreen extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnExit;
     private javax.swing.JButton btnLogin;
+    private javax.swing.JPasswordField editPassword;
+    private javax.swing.JTextField editUsername;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -222,7 +235,5 @@ public class LoginScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

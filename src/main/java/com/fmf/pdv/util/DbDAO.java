@@ -1,5 +1,7 @@
 package com.fmf.pdv.util;
 
+import com.password4j.Hash;
+import com.password4j.Password;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,7 +46,7 @@ public class DbDAO {
         String sql = "CREATE TABLE IF NOT EXISTS users("
                     + "id INT AUTO_INCREMENT PRIMARY KEY, "
                     + "username VARCHAR(50) NOT NULL, "
-                    + "password VARCHAR(255) NOT NULL, "
+                    + "password TEXT NOT NULL, "
                     + "email VARCHAR(150) NOT NULL, "
                     + "admin BOOLEAN NOT NULL DEFAULT FALSE, "
                     + "active BOOLEAN NOT NULL DEFAULT TRUE"
@@ -97,8 +99,10 @@ public class DbDAO {
         String sql = "INSERT INTO users (username, password, email, admin) VALUES (?, ?, ?, ?)";
         PreparedStatement pstm = conn.prepareStatement(sql);
 
+        Hash hash = Password.hash("admin").addRandomSalt().withScrypt();
+
         pstm.setString(1, "admin");
-        pstm.setString(2, "admin");
+        pstm.setString(2, hash.getResult());
         pstm.setString(3, "admin@email.com");
         pstm.setInt(4, 1);
 
