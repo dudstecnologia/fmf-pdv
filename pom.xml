@@ -5,6 +5,17 @@
     <artifactId>PDV</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <build>
+        <resources>
+            <resource>
+              <directory>src/main/java</directory>
+              <includes>
+                <include>**/*.jpg</include>
+                <include>**/*.png</include>
+              </includes>
+            </resource>
+        </resources>
+    </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
