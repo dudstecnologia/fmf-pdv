@@ -3,6 +3,7 @@ package com.fmf.pdv;
 import com.fmf.pdv.dao.LoginDAO;
 import com.fmf.pdv.dto.LoginDTO;
 import com.fmf.pdv.util.DbDAO;
+import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
 public class LoginScreen extends javax.swing.JFrame {
@@ -15,6 +16,26 @@ public class LoginScreen extends javax.swing.JFrame {
         loginDAO = new LoginDAO();
 
         dbDAO.createTables();
+    }
+    
+    public void login() {
+        String username = editUsername.getText();
+        String password = new String(editPassword.getPassword());
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Os campos \"Usuário\" e \"Senha\" são obrigatórios.", "Ops!", JOptionPane.ERROR_MESSAGE);
+        } else {
+            LoginDTO loginDTO = loginDAO.login(username, password);
+
+            if (loginDTO.isSuccess()) {
+                this.setVisible(false);
+
+                MainScreen mainScreen = new MainScreen(loginDTO.getUser());
+                mainScreen.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(null, "Credenciais inválidas", "Ops!", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     /**
@@ -95,9 +116,19 @@ public class LoginScreen extends javax.swing.JFrame {
 
         editUsername.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         editUsername.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        editUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                editUsernameKeyPressed(evt);
+            }
+        });
 
         editPassword.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         editPassword.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        editPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                editPasswordKeyPressed(evt);
+            }
+        });
 
         btnExit.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         btnExit.setText("Sair");
@@ -176,17 +207,20 @@ public class LoginScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_btnExitActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        LoginDTO loginDTO = loginDAO.login(editUsername.getText(), new String(editPassword.getPassword()));
-
-        if (loginDTO.isSuccess()) {
-            this.setVisible(false);
-
-            MainScreen mainScreen = new MainScreen(loginDTO.getUser());
-            mainScreen.setVisible(true);
-        } else {
-            JOptionPane.showMessageDialog(this, "Credenciais inválidos");
-        }
+        this.login();
     }//GEN-LAST:event_btnLoginActionPerformed
+
+    private void editPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_editPasswordKeyPressed
+        if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+            this.login();
+        }
+    }//GEN-LAST:event_editPasswordKeyPressed
+
+    private void editUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_editUsernameKeyPressed
+        if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+            this.login();
+        }
+    }//GEN-LAST:event_editUsernameKeyPressed
 
     /**
      * @param args the command line arguments
