@@ -1,22 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.fmf.pdv;
 
 import com.fmf.pdv.model.User;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author eduar
- */
 public class MainScreen extends javax.swing.JFrame {
+    User userLogged;
 
     public MainScreen(User user) {
         initComponents();
 
-        System.out.println("Sucesso login");
-        System.out.println(user.getEmail());
+        userLogged = user;
     }
 
     /**
@@ -40,8 +33,8 @@ public class MainScreen extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("PDV FMF");
         setPreferredSize(new java.awt.Dimension(880, 500));
+        setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(137, 0, 90));
 
@@ -192,18 +185,26 @@ public class MainScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void panelPdvMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelPdvMouseClicked
-        // TODO add your handling code here:
-        System.out.println("Clicou no PDV");
+        PdvScreen pdvScreen = new PdvScreen(userLogged);
+        pdvScreen.setVisible(true);
     }//GEN-LAST:event_panelPdvMouseClicked
 
     private void panelSalesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelSalesMouseClicked
-        // TODO add your handling code here:
-        System.out.println("Clicou no Sales");
+        if (userLogged.isAdmin()) {
+            SaleScreen saleScreen = new SaleScreen();
+            saleScreen.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(null, "Você não tem permissão para acessar esse módulo", "Ops!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_panelSalesMouseClicked
 
     private void panelUsersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelUsersMouseClicked
-        // TODO add your handling code here:
-        System.out.println("Clicou no Users");
+        if (userLogged.isAdmin()) {
+            UserScreen userScreen = new UserScreen();
+            userScreen.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(null, "Você não tem permissão para acessar esse módulo", "Ops!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_panelUsersMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

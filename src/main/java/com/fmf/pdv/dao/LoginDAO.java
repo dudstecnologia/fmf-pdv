@@ -29,10 +29,12 @@ public class LoginDAO {
                 user.setAdmin(rset.getBoolean("admin"));
                 user.setActive(rset.getBoolean("active"));
 
-                boolean passwordValid = Password.check(password, user.getPassword()).withScrypt();
+                if (user.isActive()) {
+                    boolean passwordValid = Password.check(password, user.getPassword()).withScrypt();
 
-                if (passwordValid) {
-                    loginDTO = new LoginDTO(user, passwordValid);
+                    if (passwordValid) {
+                        loginDTO = new LoginDTO(user, passwordValid);
+                    }
                 }
             }
         } catch (Exception ex) {
