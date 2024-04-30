@@ -45,6 +45,7 @@ public class DbDAO {
     public void createTableUsers(Connection conn) throws Exception {
         String sql = "CREATE TABLE IF NOT EXISTS users("
                     + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                    + "name VARCHAR(100) NOT NULL, "
                     + "username VARCHAR(50) NOT NULL, "
                     + "password TEXT NOT NULL, "
                     + "email VARCHAR(150) NOT NULL, "
@@ -96,15 +97,16 @@ public class DbDAO {
     }
 
     public void createAdminUser(Connection conn) throws Exception {
-        String sql = "INSERT INTO users (username, password, email, admin) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (name, username, password, email, admin) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement pstm = conn.prepareStatement(sql);
 
         Hash hash = Password.hash("admin").addRandomSalt().withScrypt();
 
-        pstm.setString(1, "admin");
-        pstm.setString(2, hash.getResult());
-        pstm.setString(3, "admin@email.com");
-        pstm.setInt(4, 1);
+        pstm.setString(1, "Administrador");
+        pstm.setString(2, "admin");
+        pstm.setString(3, hash.getResult());
+        pstm.setString(4, "admin@email.com");
+        pstm.setInt(5, 1);
 
         pstm.execute();
         pstm.close();
