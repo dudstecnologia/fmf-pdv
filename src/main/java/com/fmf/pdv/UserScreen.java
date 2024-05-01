@@ -2,17 +2,36 @@ package com.fmf.pdv;
 
 import com.fmf.pdv.dao.UserDAO;
 import com.fmf.pdv.model.User;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class UserScreen extends javax.swing.JFrame {
     UserDAO userDAO;
 
     public UserScreen() {
         initComponents();
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         userDAO = new UserDAO();
+        listUsers();
+    }
+    
+    public void listUsers() {
+        DefaultTableModel modeloTabelaContatos = (DefaultTableModel) tableUsers.getModel();
+        modeloTabelaContatos.setNumRows(0);
+
+        try {
+            for (User u : userDAO.getAll()) {
+                String admin = u.isAdmin() ? "Sim" : "Não";
+                String active = u.isActive() ? "Sim" : "Não";
+
+                modeloTabelaContatos.addRow(new Object[] {u.getId(), u.getUsername(), u.getEmail(), admin, active});
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(UserScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private boolean validateForm() {
@@ -53,7 +72,7 @@ public class UserScreen extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        tabUser = new javax.swing.JTabbedPane();
         panelList = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableUsers = new javax.swing.JTable();
@@ -82,10 +101,11 @@ public class UserScreen extends javax.swing.JFrame {
         setTitle("Usuários");
         setMinimumSize(new java.awt.Dimension(800, 500));
 
-        jTabbedPane1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        tabUser.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
         panelList.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
+        tableUsers.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         tableUsers.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -109,7 +129,23 @@ public class UserScreen extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tableUsers.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableUsersMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tableUsers);
+        if (tableUsers.getColumnModel().getColumnCount() > 0) {
+            tableUsers.getColumnModel().getColumn(0).setMinWidth(70);
+            tableUsers.getColumnModel().getColumn(0).setPreferredWidth(70);
+            tableUsers.getColumnModel().getColumn(0).setMaxWidth(70);
+            tableUsers.getColumnModel().getColumn(3).setMinWidth(70);
+            tableUsers.getColumnModel().getColumn(3).setPreferredWidth(70);
+            tableUsers.getColumnModel().getColumn(3).setMaxWidth(70);
+            tableUsers.getColumnModel().getColumn(4).setMinWidth(70);
+            tableUsers.getColumnModel().getColumn(4).setPreferredWidth(70);
+            tableUsers.getColumnModel().getColumn(4).setMaxWidth(70);
+        }
 
         javax.swing.GroupLayout panelListLayout = new javax.swing.GroupLayout(panelList);
         panelList.setLayout(panelListLayout);
@@ -128,7 +164,7 @@ public class UserScreen extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Lista", panelList);
+        tabUser.addTab("Lista", panelList);
 
         panelForm.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
@@ -179,6 +215,7 @@ public class UserScreen extends javax.swing.JFrame {
 
         btnDelete.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         btnDelete.setText("Excluir");
+        btnDelete.setEnabled(false);
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteActionPerformed(evt);
@@ -291,17 +328,17 @@ public class UserScreen extends javax.swing.JFrame {
                 .addContainerGap(238, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Formulário", panelForm);
+        tabUser.addTab("Formulário", panelForm);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(tabUser)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(tabUser)
         );
 
         pack();
@@ -321,7 +358,7 @@ public class UserScreen extends javax.swing.JFrame {
             try {
                 userDAO.insert(user);
 
-                JOptionPane.showMessageDialog(null, "Salvo com sucesso", "Perfeito");
+                JOptionPane.showMessageDialog(null, "Salvo com sucesso", "Perfeito", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
                 System.out.println("Passou em erro: " + e.getMessage());
             }
@@ -331,6 +368,32 @@ public class UserScreen extends javax.swing.JFrame {
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         System.out.println("Vai excluir");
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void tableUsersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableUsersMouseClicked
+        if (evt.getClickCount() == 2) {
+            try {
+                int idSelected = Integer.parseInt(tableUsers.getValueAt(tableUsers.getSelectedRow(), 0).toString());
+
+                User user = userDAO.getOne(idSelected);
+
+                if (user != null) {
+                    txtId.setText(String.valueOf(user.getId()));
+                    txtName.setText(user.getName());
+                    txtUsername.setText(user.getUsername());
+                    txtEmail.setText(user.getEmail());
+                    comboAdmin.setSelectedItem(user.isAdmin() ? "Administrador" : "Vendedor");
+                    comboActive.setSelectedItem(user.isActive()? "Sim" : "Não");
+
+                    btnDelete.setEnabled(true);
+                    tabUser.setSelectedIndex(1);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Este usuário não existe mais", "Ops", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                System.out.println("Passou em erro: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_tableUsersMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
@@ -347,9 +410,9 @@ public class UserScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel panelForm;
     private javax.swing.JPanel panelList;
+    private javax.swing.JTabbedPane tabUser;
     private javax.swing.JTable tableUsers;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtId;
