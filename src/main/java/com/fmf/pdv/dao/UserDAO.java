@@ -79,7 +79,7 @@ public class UserDAO {
     }
 
     public void delete(String id) throws Exception {
-        String sql = "DELETE FROM users WHERE codigo = ?";
+        String sql = "DELETE FROM users WHERE id = ?";
         Connection con = ConnectionFactory.getConnection();
         PreparedStatement pstm = con.prepareStatement(sql);
 

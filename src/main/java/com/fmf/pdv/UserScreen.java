@@ -42,8 +42,10 @@ public class UserScreen extends javax.swing.JFrame {
         txtEmail.setText("");
         comboAdmin.setSelectedItem("Vendedor");
         comboActive.setSelectedItem("Sim");
+        txtPassword.setText("");
+        txtPasswordConfirm.setText("");
 
-        btnDelete.setEnabled(true);
+        btnDelete.setEnabled(false);
     }
 
     private boolean validateForm() {
@@ -390,7 +392,19 @@ public class UserScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        System.out.println("Vai excluir");
+        int selection = JOptionPane.showConfirmDialog(null, "Confirma a exclusão?", "Atenção", JOptionPane.YES_NO_OPTION);
+
+        if (selection == 0) {
+            try {
+                userDAO.delete(txtId.getText());
+
+                saved = true;
+                tabUser.setSelectedIndex(0);
+                JOptionPane.showMessageDialog(null, "Apagado com sucesso", "Perfeito", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Erro ao excluir, detalhes: " + e.getMessage(), "Ops", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void tableUsersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableUsersMouseClicked
