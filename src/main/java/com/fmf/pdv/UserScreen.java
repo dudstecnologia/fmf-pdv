@@ -4,12 +4,13 @@ import com.fmf.pdv.dao.UserDAO;
 import com.fmf.pdv.model.User;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class UserScreen extends javax.swing.JFrame {
     UserDAO userDAO;
+    boolean saved = false;
+    User userSelected;
 
     public UserScreen() {
         initComponents();
@@ -17,7 +18,7 @@ public class UserScreen extends javax.swing.JFrame {
         userDAO = new UserDAO();
         listUsers();
     }
-    
+
     public void listUsers() {
         DefaultTableModel modeloTabelaContatos = (DefaultTableModel) tableUsers.getModel();
         modeloTabelaContatos.setNumRows(0);
@@ -32,6 +33,17 @@ public class UserScreen extends javax.swing.JFrame {
         } catch (Exception ex) {
             Logger.getLogger(UserScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private void clearForm() {
+        txtId.setText("");
+        txtName.setText("");
+        txtUsername.setText("");
+        txtEmail.setText("");
+        comboAdmin.setSelectedItem("Vendedor");
+        comboActive.setSelectedItem("Sim");
+
+        btnDelete.setEnabled(true);
     }
 
     private boolean validateForm() {
@@ -102,6 +114,11 @@ public class UserScreen extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(800, 500));
 
         tabUser.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        tabUser.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tabUserStateChanged(evt);
+            }
+        });
 
         panelList.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
@@ -356,11 +373,18 @@ public class UserScreen extends javax.swing.JFrame {
             user.setActive(comboActive.getSelectedItem() == "Sim");
 
             try {
-                userDAO.insert(user);
+                if (txtId.getText().isEmpty()) {
+                    userDAO.insert(user);
+                } else {
+                    user.setId(Integer.parseInt(txtId.getText()));
+                    userDAO.update(user);
+                }
 
+                saved = true;
+                tabUser.setSelectedIndex(0);
                 JOptionPane.showMessageDialog(null, "Salvo com sucesso", "Perfeito", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
-                System.out.println("Passou em erro: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "Erro ao salvar, detalhes: " + e.getMessage(), "Ops", JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -374,15 +398,15 @@ public class UserScreen extends javax.swing.JFrame {
             try {
                 int idSelected = Integer.parseInt(tableUsers.getValueAt(tableUsers.getSelectedRow(), 0).toString());
 
-                User user = userDAO.getOne(idSelected);
+                userSelected = userDAO.getOne(idSelected);
 
-                if (user != null) {
-                    txtId.setText(String.valueOf(user.getId()));
-                    txtName.setText(user.getName());
-                    txtUsername.setText(user.getUsername());
-                    txtEmail.setText(user.getEmail());
-                    comboAdmin.setSelectedItem(user.isAdmin() ? "Administrador" : "Vendedor");
-                    comboActive.setSelectedItem(user.isActive()? "Sim" : "Não");
+                if (userSelected != null) {
+                    txtId.setText(String.valueOf(userSelected.getId()));
+                    txtName.setText(userSelected.getName());
+                    txtUsername.setText(userSelected.getUsername());
+                    txtEmail.setText(userSelected.getEmail());
+                    comboAdmin.setSelectedItem(userSelected.isAdmin() ? "Administrador" : "Vendedor");
+                    comboActive.setSelectedItem(userSelected.isActive()? "Sim" : "Não");
 
                     btnDelete.setEnabled(true);
                     tabUser.setSelectedIndex(1);
@@ -390,10 +414,28 @@ public class UserScreen extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Este usuário não existe mais", "Ops", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception e) {
-                System.out.println("Passou em erro: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "Erro ao selecionar, detalhes: " + e.getMessage(), "Ops", JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_tableUsersMouseClicked
+
+    private void tabUserStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabUserStateChanged
+        if (tabUser.getSelectedIndex() == 0) {
+            userSelected = null;
+
+            if (saved) {
+                listUsers();
+            }
+        }
+
+        if (tabUser.getSelectedIndex() == 1) {
+            saved = false;
+
+            if (userSelected == null) {
+                clearForm();
+            }
+        }
+    }//GEN-LAST:event_tabUserStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
