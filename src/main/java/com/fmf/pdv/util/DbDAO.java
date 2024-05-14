@@ -60,6 +60,7 @@ public class DbDAO {
         String sql = "CREATE TABLE IF NOT EXISTS products("
                     + "id INT AUTO_INCREMENT PRIMARY KEY, "
                     + "name VARCHAR(150) NOT NULL, "
+                    + "barcode VARCHAR(100) NOT NULL, "
                     + "price DECIMAL(10, 2) NOT NULL, "
                     + "stock INT NOT NULL DEFAULT 0, "
                     + "active BOOLEAN NOT NULL DEFAULT TRUE"
