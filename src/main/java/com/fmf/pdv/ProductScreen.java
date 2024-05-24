@@ -1,15 +1,64 @@
 package com.fmf.pdv;
 
+import com.fmf.pdv.dao.ProductDAO;
+import com.fmf.pdv.model.Product;
 import com.fmf.pdv.util.ABMTextField;
 import java.text.DecimalFormat;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class ProductScreen extends javax.swing.JFrame {
     DecimalFormat formatDecimal;
+    ProductDAO productDAO;
+    boolean saved = false;
+    Product productSelected;
 
     public ProductScreen() {
         formatDecimal = new DecimalFormat("###,##0.00");
 
+        productDAO = new ProductDAO();
         initComponents();
+        listProducts();
+    }
+    
+    public void listProducts() {
+        DefaultTableModel tableModel = (DefaultTableModel) tableProducts.getModel();
+        tableModel.setNumRows(0);
+
+        try {
+            for (Product p : productDAO.getAll()) {
+                String active = p.isActive() ? "Sim" : "Não";
+
+                tableModel.addRow(new Object[] {p.getId(), p.getName(), p.getPrice(), p.getStock(), active});
+            }
+        } catch (Exception ex) {}
+    }
+    
+    private void clearForm() {
+        txtId.setText("");
+        txtName.setText("");
+        txtBarcode.setText("");
+        txtPrice.setText("");
+        txtStock.setText("");
+        comboActive.setSelectedItem("Sim");
+
+        btnDelete.setEnabled(false);
+    }
+
+    private boolean validateForm() {
+        String price = txtPrice.getText().replace(".", "").replace(",", ".");
+
+        if (txtName.getText().isEmpty() || txtBarcode.getText().isEmpty() || txtPrice.getText().isEmpty() || txtStock.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Os campos são obrigatórios", "Ops!", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if (Double.parseDouble(price) == 0) {
+            JOptionPane.showMessageDialog(null, "O preço do produto é obrigatório", "Ops!", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -35,16 +84,21 @@ public class ProductScreen extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         txtBarcode = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtStock = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         btnDelete = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         txtPrice = new ABMTextField( formatDecimal );
+        txtStock = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         tabProduct.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        tabProduct.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tabProductStateChanged(evt);
+            }
+        });
 
         tableProducts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -60,6 +114,11 @@ public class ProductScreen extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        tableProducts.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableProductsMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(tableProducts);
@@ -122,8 +181,6 @@ public class ProductScreen extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel5.setText("Preço");
 
-        txtStock.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-
         jLabel6.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel6.setText("Estoque");
 
@@ -169,6 +226,15 @@ public class ProductScreen extends javax.swing.JFrame {
 
         txtPrice.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
+        txtStock.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
+        txtStock.setText("1");
+        txtStock.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtStock.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtStockKeyReleased(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelFormLayout = new javax.swing.GroupLayout(panelForm);
         panelForm.setLayout(panelFormLayout);
         panelFormLayout.setHorizontalGroup(
@@ -201,7 +267,7 @@ public class ProductScreen extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -230,16 +296,16 @@ public class ProductScreen extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtBarcode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(panelFormLayout.createSequentialGroup()
                         .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
                             .addComponent(jLabel6))
                         .addGap(29, 29, 29)))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(302, Short.MAX_VALUE))
+                .addContainerGap(314, Short.MAX_VALUE))
         );
 
         tabProduct.addTab("Formulário", panelForm);
@@ -260,12 +326,100 @@ public class ProductScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        
+        int selection = JOptionPane.showConfirmDialog(null, "Confirma a exclusão?", "Atenção", JOptionPane.YES_NO_OPTION);
+
+        if (selection == 0) {
+            try {
+                productDAO.delete(txtId.getText());
+
+                saved = true;
+                tabProduct.setSelectedIndex(0);
+                JOptionPane.showMessageDialog(null, "Apagado com sucesso", "Perfeito", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Erro ao excluir, detalhes: " + e.getMessage(), "Ops", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        
+        if (validateForm()) {
+            String price = txtPrice.getText().replace(".", "").replace(",", ".");
+
+            Product product = new Product();
+            product.setName(txtName.getText());
+            product.setBarcode(txtBarcode.getText());
+            product.setPrice(Double.parseDouble(price));
+            product.setStock(Integer.parseInt(txtStock.getText()));
+            product.setActive(comboActive.getSelectedItem() == "Sim");
+
+            try {
+                if (txtId.getText().isEmpty()) {
+                    productDAO.insert(product);
+                } else {
+                    product.setId(Integer.parseInt(txtId.getText()));
+                    productDAO.update(product);
+                }
+
+                saved = true;
+                tabProduct.setSelectedIndex(0);
+                JOptionPane.showMessageDialog(null, "Salvo com sucesso", "Perfeito", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Erro ao salvar, detalhes: " + e.getMessage(), "Ops", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void txtStockKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStockKeyReleased
+        try {
+            Integer.parseInt(txtStock.getText());
+        } catch (NumberFormatException nfe) {
+            txtStock.setText("");
+        }
+    }//GEN-LAST:event_txtStockKeyReleased
+
+    private void tableProductsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableProductsMouseClicked
+        if (evt.getClickCount() == 2) {
+            try {
+                int idSelected = Integer.parseInt(tableProducts.getValueAt(tableProducts.getSelectedRow(), 0).toString());
+
+                productSelected = productDAO.getOne(idSelected);
+
+                if (productSelected != null) {
+                    txtId.setText(String.valueOf(productSelected.getId()));
+                    txtName.setText(productSelected.getName());
+                    txtBarcode.setText(productSelected.getBarcode());
+                    txtPrice.setText(String.valueOf(productSelected.getPrice()));
+                    txtStock.setText(String.valueOf(productSelected.getStock()));
+                    comboActive.setSelectedItem(productSelected.isActive()? "Sim" : "Não");
+
+                    btnDelete.setEnabled(true);
+                    tabProduct.setSelectedIndex(1);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Este produto não existe mais", "Ops", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Erro ao selecionar, detalhes: " + e.getMessage(), "Ops", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_tableProductsMouseClicked
+
+    private void tabProductStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabProductStateChanged
+        if (tabProduct.getSelectedIndex() == 0) {
+            productSelected = null;
+
+            if (saved) {
+                listProducts();
+            }
+        }
+
+        if (tabProduct.getSelectedIndex() == 1) {
+            saved = false;
+
+            if (productSelected == null) {
+                clearForm();
+            }
+        }
+    }//GEN-LAST:event_tabProductStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
@@ -287,6 +441,6 @@ public class ProductScreen extends javax.swing.JFrame {
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtPrice;
-    private javax.swing.JTextField txtStock;
+    private javax.swing.JFormattedTextField txtStock;
     // End of variables declaration//GEN-END:variables
 }
