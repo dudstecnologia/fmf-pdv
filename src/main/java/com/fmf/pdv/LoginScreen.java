@@ -1,7 +1,7 @@
 package com.fmf.pdv;
 
 import com.fmf.pdv.dao.LoginDAO;
-import com.fmf.pdv.dto.LoginDTO;
+import com.fmf.pdv.model.User;
 import com.fmf.pdv.util.DbDAO;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
@@ -25,14 +25,13 @@ public class LoginScreen extends javax.swing.JFrame {
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Os campos \"Usuário\" e \"Senha\" são obrigatórios.", "Ops!", JOptionPane.ERROR_MESSAGE);
         } else {
-            LoginDTO loginDTO = loginDAO.login(username, password);
+            try {
+                User user = loginDAO.login(username, password);
 
-            if (loginDTO.isSuccess()) {
                 this.setVisible(false);
-
-                MainScreen mainScreen = new MainScreen(loginDTO.getUser());
+                MainScreen mainScreen = new MainScreen(user);
                 mainScreen.setVisible(true);
-            } else {
+            } catch(Exception e) {
                 JOptionPane.showMessageDialog(null, "Credenciais inválidas", "Ops!", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -207,18 +206,18 @@ public class LoginScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_btnExitActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        this.login();
+        login();
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void editPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_editPasswordKeyPressed
         if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
-            this.login();
+            login();
         }
     }//GEN-LAST:event_editPasswordKeyPressed
 
     private void editUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_editUsernameKeyPressed
         if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
-            this.login();
+            login();
         }
     }//GEN-LAST:event_editUsernameKeyPressed
 
