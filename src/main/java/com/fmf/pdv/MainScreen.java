@@ -10,6 +10,8 @@ public class MainScreen extends javax.swing.JFrame {
         initComponents();
 
         userLogged = user;
+        
+        setTitle("Usuário: " + user.getName());
     }
 
     /**
@@ -36,6 +38,7 @@ public class MainScreen extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Usuário: ");
         setPreferredSize(new java.awt.Dimension(990, 350));
         setResizable(false);
 

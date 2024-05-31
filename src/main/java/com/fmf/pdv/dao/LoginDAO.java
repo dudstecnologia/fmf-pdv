@@ -20,6 +20,7 @@ public class LoginDAO {
             User user = new User();
 
             user.setId(rset.getInt("id"));
+            user.setName(rset.getString("name"));
             user.setUsername(rset.getString("username"));
             user.setPassword(rset.getString("password"));
             user.setEmail(rset.getString("email"));
