@@ -73,6 +73,29 @@ public class ProductDAO {
 
         return product;
     }
+    
+    public Product getByBarcode(String barcode) throws Exception {
+        Product product = null;
+
+        String sql = "select * from products where barcode = ?";
+        Connection con = ConnectionFactory.getConnection();
+        PreparedStatement pstm = con.prepareStatement(sql);
+        pstm.setString(1, barcode);
+        ResultSet rset = pstm.executeQuery();
+
+        if (rset.next()) {
+            product = new Product();
+
+            product.setId(rset.getInt("id"));
+            product.setName(rset.getString("name"));
+            product.setBarcode(rset.getString("barcode"));
+            product.setPrice(rset.getDouble("price"));
+            product.setStock(rset.getInt("stock"));
+            product.setActive(rset.getBoolean("active"));
+        }
+
+        return product;
+    }
 
     public void delete(String id) throws Exception {
         String sql = "DELETE FROM products WHERE id = ?";

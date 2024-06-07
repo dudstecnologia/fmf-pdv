@@ -1,16 +1,21 @@
 package com.fmf.pdv;
 
+import com.fmf.pdv.dao.ProductDAO;
 import com.fmf.pdv.model.Product;
 import com.fmf.pdv.model.User;
+import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class PdvScreen extends javax.swing.JFrame {
+    ProductDAO productDAO;
 
     public PdvScreen(User user) {
         initComponents();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        
+
+        productDAO = new ProductDAO();
         listProducts();
     }
     
@@ -44,8 +49,9 @@ public class PdvScreen extends javax.swing.JFrame {
         tableProducts = new javax.swing.JTable();
         txtQtd = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        txtProduct = new javax.swing.JFormattedTextField();
+        txtBarcode = new javax.swing.JFormattedTextField();
         jLabel2 = new javax.swing.JLabel();
+        lbErro = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("PDV");
@@ -145,10 +151,19 @@ public class PdvScreen extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
         jLabel1.setText("QUANTIDADE");
 
-        txtProduct.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
+        txtBarcode.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
+        txtBarcode.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtBarcodeKeyPressed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
         jLabel2.setText("PRODUTO");
+
+        lbErro.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
+        lbErro.setForeground(new java.awt.Color(255, 51, 51));
+        lbErro.setText("...");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -167,8 +182,11 @@ public class PdvScreen extends javax.swing.JFrame {
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtProduct)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(txtBarcode)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(18, 18, 18)
+                                .addComponent(lbErro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -181,17 +199,37 @@ public class PdvScreen extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel2)
+                    .addComponent(lbErro))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtQtd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtBarcode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtBarcodeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBarcodeKeyPressed
+        lbErro.setText("");
+
+        if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+            String barCode = txtBarcode.getText();
+
+            if (!barCode.isEmpty()) {
+                try {
+                    Product product = productDAO.getByBarcode(barCode);
+                    System.out.println("Produto: " + product.getName());
+                } catch (Exception ex) {
+                    lbErro.setText("Ops! Produto não encontrado");
+                }
+
+                txtBarcode.setText("");
+            }
+        }
+    }//GEN-LAST:event_txtBarcodeKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -202,9 +240,10 @@ public class PdvScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbErro;
     private javax.swing.JLabel lbTotal;
     private javax.swing.JTable tableProducts;
-    private javax.swing.JFormattedTextField txtProduct;
+    private javax.swing.JFormattedTextField txtBarcode;
     private javax.swing.JTextField txtQtd;
     // End of variables declaration//GEN-END:variables
 }
