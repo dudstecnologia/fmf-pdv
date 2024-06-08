@@ -1,21 +1,24 @@
 package com.fmf.pdv;
 
 import com.fmf.pdv.dao.ProductDAO;
+import com.fmf.pdv.model.Order;
+import com.fmf.pdv.model.OrderItem;
 import com.fmf.pdv.model.Product;
 import com.fmf.pdv.model.User;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-public class PdvScreen extends javax.swing.JFrame {
+public class PdvScreen extends JFrame {
     ProductDAO productDAO;
+    Order order;
 
     public PdvScreen(User user) {
         initComponents();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         productDAO = new ProductDAO();
+        order = new Order();
         listProducts();
     }
     
@@ -24,8 +27,13 @@ public class PdvScreen extends javax.swing.JFrame {
         tableModel.setNumRows(0);
 
         try {
-            for (int i = 0; i < 5; i++) {
-                tableModel.addRow(new Object[] {"Produto teste" + i, (1000.50 + 1), (1000 + i), (1000.60 + i)});
+            for (OrderItem item: order.getItems()) {
+                tableModel.addRow(new Object[] {
+                    item.getProduct().getName(),
+                    item.getProduct().getPrice(),
+                    item.getQuantity(),
+                    item.getTotalPrice()
+                });
             }
         } catch (Exception ex) {}
     }
@@ -217,13 +225,24 @@ public class PdvScreen extends javax.swing.JFrame {
 
         if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
             String barCode = txtBarcode.getText();
+            int quantity = 1;
+
+            try {
+                quantity = Integer.parseInt(txtQtd.getText());
+            } catch(Exception e) {
+                System.out.println("Erro: " + e.getMessage());
+            }
 
             if (!barCode.isEmpty()) {
                 try {
                     Product product = productDAO.getByBarcode(barCode);
-                    System.out.println("Produto: " + product.getName());
+                    order.addProduct(product, quantity);
+
+                    lbTotal.setText(order.getTotalFormmated());
+                    listProducts();
                 } catch (Exception ex) {
                     lbErro.setText("Ops! Produto não encontrado");
+                    System.out.println("Erro: " + ex.getMessage());
                 }
 
                 txtBarcode.setText("");
