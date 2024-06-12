@@ -42,6 +42,12 @@ public class Helpers {
 	return d[2] + "-" + d[1] + "-" + d[0];
     }
     
+    public static String dateDbToBr(String date) {
+        String[] d = date.substring(0, 10).split("-");
+
+	return d[2] + "/" + d[1] + "/" + d[0];
+    }
+
     public static void maskDate(JFormattedTextField jFormattedTextField) {
         try {
             jFormattedTextField.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("##/##/####")));

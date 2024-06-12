@@ -70,7 +70,12 @@ public class SaleScreen extends javax.swing.JFrame {
                 for (Order o : orders) {
                     totalFinal += o.getTotalLocal();
 
-                    tableModel.addRow(new Object[] {o.getId(), o.getDate(), Helpers.moneyFormat(o.getTotalLocal()), o.getNameUser()});
+                    tableModel.addRow(new Object[] {
+                        o.getId(), 
+                        Helpers.dateDbToBr(o.getDate()), 
+                        Helpers.moneyFormat(o.getTotalLocal()), 
+                        o.getNameUser()
+                    });
                 }
 
                 txtTotalFinal.setText(Helpers.moneyFormat(totalFinal));
@@ -193,6 +198,7 @@ public class SaleScreen extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        tableOrders.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         tableOrders.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -212,7 +218,13 @@ public class SaleScreen extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tableOrders.setRowHeight(22);
         jScrollPane1.setViewportView(tableOrders);
+        if (tableOrders.getColumnModel().getColumnCount() > 0) {
+            tableOrders.getColumnModel().getColumn(0).setMinWidth(100);
+            tableOrders.getColumnModel().getColumn(0).setPreferredWidth(100);
+            tableOrders.getColumnModel().getColumn(0).setMaxWidth(100);
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
