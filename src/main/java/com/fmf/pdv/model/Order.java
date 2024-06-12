@@ -6,18 +6,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
+    private int id;
     private String date;
+    private double totalLocal;
+    private String nameUser;
     private List<OrderItem> items;
-    
+
     public Order() {
         items = new ArrayList<>();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getDate() {
         return date;
     }
 
-    private void setDate(String date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -59,5 +70,21 @@ public class Order {
     
     public void clearItems() {
         this.items.clear();
+    }
+
+    public double getTotalLocal() {
+        return totalLocal;
+    }
+
+    public void setTotalLocal(double totalLocal) {
+        this.totalLocal = totalLocal;
+    }
+
+    public String getNameUser() {
+        return nameUser;
+    }
+
+    public void setNameUser(String nameUser) {
+        this.nameUser = nameUser;
     }
 }

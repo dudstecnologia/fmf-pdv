@@ -22,7 +22,7 @@ public class ChartSalesMonths {
     }
 
     public JFreeChart createBarChart(CategoryDataset dataset) {
-        JFreeChart jFreeChart = ChartFactory.createLineChart("Titulo Chart", "Mês", "Valor", dataset, PlotOrientation.VERTICAL, false, true, false);
+        JFreeChart jFreeChart = ChartFactory.createLineChart("Faturamento Mensal", "Mês", "Valor", dataset, PlotOrientation.VERTICAL, false, true, false);
 
         return jFreeChart;
     }

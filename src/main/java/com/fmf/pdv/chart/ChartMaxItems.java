@@ -33,7 +33,7 @@ public class ChartMaxItems {
 
         ChartPanel panel = new ChartPanel(jFreeChart);
 
-        panel.setPreferredSize(new Dimension(300, 300));
+        panel.setPreferredSize(new Dimension(350, 300));
 
         return panel;
     }

@@ -1,32 +1,36 @@
 package com.fmf.pdv;
 
-import com.fmf.pdv.chart.ChartExample;
 import com.fmf.pdv.chart.ChartMaxItems;
 import com.fmf.pdv.chart.ChartSalesMonths;
 import com.fmf.pdv.dao.SaleDAO;
 import com.fmf.pdv.model.ChartValue;
+import com.fmf.pdv.model.Order;
+import com.fmf.pdv.util.Helpers;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class SaleScreen extends javax.swing.JFrame {
     SaleDAO saleDAO;
+    double totalFinal;
 
     public SaleScreen() {
         initComponents();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         saleDAO = new SaleDAO();
 
-        /*
-        ChartExample chartExample = new ChartExample();
-        panelChart.setLayout(new BorderLayout());
-        panelChart.add(chartExample.createChart());
-        panelChart.removeAll();
-        */
         showChartProducts();
         showChartLastSales();
+        
+        String dateTodayClear = Helpers.dateTodayBr().replace("/", "");
+        txtStartDate.setText(dateTodayClear);
+        txtEndDate.setText(dateTodayClear);
+        
+        search();
     }
 
     private void showChartProducts() {
@@ -48,6 +52,33 @@ public class SaleScreen extends javax.swing.JFrame {
             panelChartSales.add(chartSalesMonths.createChart(salesMonths));
         } catch (Exception ex) {}
     }
+    
+    private void search() {
+        totalFinal = 0;
+        String dateStart = txtStartDate.getText();
+        String dateEnd = txtEndDate.getText();
+
+        if (dateStart.trim().length() < 10 || dateEnd.trim().length() < 10) {
+            JOptionPane.showMessageDialog(null, "As duas datas são obrigatórias!", "Ops!", JOptionPane.ERROR_MESSAGE);
+        } else {
+            try {
+                DefaultTableModel tableModel = (DefaultTableModel) tableOrders.getModel();
+                tableModel.setNumRows(0);
+
+                List<Order> orders = saleDAO.listOrdersFromPeriod(Helpers.dateToDb(dateStart), Helpers.dateToDb(dateEnd));
+                
+                for (Order o : orders) {
+                    totalFinal += o.getTotalLocal();
+
+                    tableModel.addRow(new Object[] {o.getId(), o.getDate(), Helpers.moneyFormat(o.getTotalLocal()), o.getNameUser()});
+                }
+
+                txtTotalFinal.setText(Helpers.moneyFormat(totalFinal));
+            } catch (Exception ex) {
+                Logger.getLogger(SaleScreen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -61,11 +92,16 @@ public class SaleScreen extends javax.swing.JFrame {
         panelChartProduct = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
-        jFormattedTextField2 = new javax.swing.JFormattedTextField();
+        txtStartDate = new javax.swing.JFormattedTextField();
+        Helpers.maskDate(txtStartDate);
+        txtEndDate = new javax.swing.JFormattedTextField();
+        Helpers.maskDate(txtEndDate);
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btnSearch = new javax.swing.JButton();
+        txtTotalFinal = new javax.swing.JLabel();
         panelChartSales = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableOrders = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Vendas");
@@ -87,15 +123,27 @@ public class SaleScreen extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(137, 0, 90));
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Data Inicial");
 
-        jFormattedTextField1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txtStartDate.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
-        jFormattedTextField2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        txtEndDate.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Data Final");
 
-        jButton1.setText("Buscar");
+        btnSearch.setText("Buscar");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
+
+        txtTotalFinal.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
+        txtTotalFinal.setForeground(new java.awt.Color(255, 255, 255));
+        txtTotalFinal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        txtTotalFinal.setText("R$ 0,0");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -104,15 +152,17 @@ public class SaleScreen extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jFormattedTextField1)
+                    .addComponent(txtStartDate)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jFormattedTextField2)
+                    .addComponent(txtEndDate)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(btnSearch)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtTotalFinal, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,9 +173,10 @@ public class SaleScreen extends javax.swing.JFrame {
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jFormattedTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(txtStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSearch)
+                    .addComponent(txtTotalFinal))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -142,17 +193,42 @@ public class SaleScreen extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        tableOrders.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Código", "Data", "Valor Total", "Usuário"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tableOrders);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelChartProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(panelChartSales, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(64, Short.MAX_VALUE))
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(panelChartProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(panelChartSales, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 58, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,21 +238,30 @@ public class SaleScreen extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panelChartProduct, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelChartSales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(374, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        search();
+    }//GEN-LAST:event_btnSearchActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
-    private javax.swing.JFormattedTextField jFormattedTextField2;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel panelChartProduct;
     private javax.swing.JPanel panelChartSales;
+    private javax.swing.JTable tableOrders;
+    private javax.swing.JFormattedTextField txtEndDate;
+    private javax.swing.JFormattedTextField txtStartDate;
+    private javax.swing.JLabel txtTotalFinal;
     // End of variables declaration//GEN-END:variables
 }
