@@ -1,18 +1,40 @@
 package com.fmf.pdv;
 
-import chart.ChartExample;
+import com.fmf.pdv.chart.ChartExample;
+import com.fmf.pdv.chart.ChartMaxItems;
+import com.fmf.pdv.dao.SaleDAO;
+import com.fmf.pdv.model.OrderItemChart;
 import java.awt.BorderLayout;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 public class SaleScreen extends javax.swing.JFrame {
+    SaleDAO saleDAO;
 
     public SaleScreen() {
         initComponents();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        saleDAO = new SaleDAO();
 
+        /*
         ChartExample chartExample = new ChartExample();
         panelChart.setLayout(new BorderLayout());
         panelChart.add(chartExample.createChart());
+        panelChart.removeAll();
+        */
+        showChartProducts();
+    }
+
+    private void showChartProducts() {
+        try {
+            List<OrderItemChart> maxItems = saleDAO.getMaxItems();
+
+            ChartMaxItems chartMaxItems = new ChartMaxItems();
+            panelChartProduct.setLayout(new BorderLayout());
+            panelChartProduct.add(chartMaxItems.createChart(maxItems));
+        } catch (Exception ex) {}
     }
 
     /**
@@ -24,22 +46,27 @@ public class SaleScreen extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panelChart = new javax.swing.JPanel();
+        panelChartProduct = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Vendas");
         setMinimumSize(new java.awt.Dimension(800, 500));
 
-        javax.swing.GroupLayout panelChartLayout = new javax.swing.GroupLayout(panelChart);
-        panelChart.setLayout(panelChartLayout);
-        panelChartLayout.setHorizontalGroup(
-            panelChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        panelChartProduct.setBackground(new java.awt.Color(51, 51, 255));
+
+        javax.swing.GroupLayout panelChartProductLayout = new javax.swing.GroupLayout(panelChartProduct);
+        panelChartProduct.setLayout(panelChartProductLayout);
+        panelChartProductLayout.setHorizontalGroup(
+            panelChartProductLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panelChartProductLayout.setVerticalGroup(
+            panelChartProductLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 350, Short.MAX_VALUE)
         );
-        panelChartLayout.setVerticalGroup(
-            panelChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 350, Short.MAX_VALUE)
-        );
+
+        jLabel1.setText("jLabel1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -47,15 +74,19 @@ public class SaleScreen extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(panelChartProduct, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE))
                 .addContainerGap(444, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addComponent(panelChartProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addContainerGap(110, Short.MAX_VALUE))
         );
 
         pack();
@@ -63,6 +94,7 @@ public class SaleScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel panelChart;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel panelChartProduct;
     // End of variables declaration//GEN-END:variables
 }
