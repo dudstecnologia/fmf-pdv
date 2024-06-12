@@ -74,7 +74,6 @@ public class DbDAO {
                     + "id INT AUTO_INCREMENT PRIMARY KEY, "
                     + "date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, "
                     + "total DECIMAL(10, 2) NOT NULL DEFAULT 0, "
-                    + "discount DECIMAL(10, 2) NOT NULL DEFAULT 0, "
                     + "user_id INT NOT NULL, "
                     + "FOREIGN KEY (user_id) REFERENCES users(id)"
                     + ")";

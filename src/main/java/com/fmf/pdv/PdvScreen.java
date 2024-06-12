@@ -1,5 +1,6 @@
 package com.fmf.pdv;
 
+import com.fmf.pdv.dao.PdvDAO;
 import com.fmf.pdv.dao.ProductDAO;
 import com.fmf.pdv.model.Order;
 import com.fmf.pdv.model.OrderItem;
@@ -8,10 +9,13 @@ import com.fmf.pdv.model.User;
 import com.fmf.pdv.util.Helpers;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class PdvScreen extends JFrame {
     ProductDAO productDAO;
+    User userLogged;
+    PdvDAO pdvDAO;
     Order order;
 
     public PdvScreen(User user) {
@@ -19,12 +23,15 @@ public class PdvScreen extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         productDAO = new ProductDAO();
+        pdvDAO = new PdvDAO();
+        userLogged = user;
         order = new Order();
         lbErro.setText("");
+        txtBarcode.requestFocus();
         listProducts();
     }
     
-    public void listProducts() {
+    public final void listProducts() {
         DefaultTableModel tableModel = (DefaultTableModel) tableProducts.getModel();
         tableModel.setNumRows(0);
 
@@ -62,6 +69,7 @@ public class PdvScreen extends JFrame {
         txtBarcode = new javax.swing.JFormattedTextField();
         jLabel2 = new javax.swing.JLabel();
         lbErro = new javax.swing.JLabel();
+        btnFinishSale = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("PDV");
@@ -175,6 +183,15 @@ public class PdvScreen extends JFrame {
         lbErro.setForeground(new java.awt.Color(255, 51, 51));
         lbErro.setText("...");
 
+        btnFinishSale.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
+        btnFinishSale.setText("Finalizar Venda");
+        btnFinishSale.setActionCommand("");
+        btnFinishSale.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFinishSaleActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -192,11 +209,14 @@ public class PdvScreen extends JFrame {
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtBarcode)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addGap(18, 18, 18)
-                                .addComponent(lbErro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                                .addComponent(lbErro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtBarcode)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnFinishSale)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -214,7 +234,8 @@ public class PdvScreen extends JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtQtd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtBarcode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtBarcode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnFinishSale))
                 .addContainerGap())
         );
 
@@ -225,13 +246,6 @@ public class PdvScreen extends JFrame {
     private void txtBarcodeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBarcodeKeyPressed
         if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
             String barCode = txtBarcode.getText();
-            int quantity = 1;
-
-            try {
-                quantity = Integer.parseInt(txtQtd.getText());
-            } catch(Exception e) {
-                System.out.println("Erro: " + e.getMessage());
-            }
 
             if (!barCode.isEmpty()) {
                 try {
@@ -239,7 +253,7 @@ public class PdvScreen extends JFrame {
 
                     if (product != null) {
                         lbErro.setText("");
-                        order.addProduct(product, quantity);
+                        order.addProduct(product, Helpers.parseQuantity(txtQtd.getText()));
 
                         lbTotal.setText(order.getTotalFormmated());
                         listProducts();
@@ -256,7 +270,22 @@ public class PdvScreen extends JFrame {
         }
     }//GEN-LAST:event_txtBarcodeKeyPressed
 
+    private void btnFinishSaleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinishSaleActionPerformed
+        try {
+            pdvDAO.insert(order, userLogged);
+            lbErro.setText("Venda Finalizada");
+
+            order.clearItems();
+            listProducts();
+            lbTotal.setText(order.getTotalFormmated());
+            txtBarcode.requestFocus();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao salvar, detalhes: " + ex.getMessage(), "Ops", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_btnFinishSaleActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnFinishSale;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

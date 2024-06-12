@@ -57,5 +57,7 @@ public class Order {
         this.items = items;
     }
     
-    
+    public void clearItems() {
+        this.items.clear();
+    }
 }
