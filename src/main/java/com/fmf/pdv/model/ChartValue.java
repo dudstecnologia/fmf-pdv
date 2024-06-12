@@ -1,10 +1,10 @@
 package com.fmf.pdv.model;
 
-public class OrderItemChart {
+public class ChartValue {
     private String name;
     private int total;
     
-    public OrderItemChart(String name, int total) {
+    public ChartValue(String name, int total) {
         this.setName(name);
         this.setTotal(total);
     }
@@ -24,6 +24,4 @@ public class OrderItemChart {
     public void setTotal(int total) {
         this.total = total;
     }
-    
-    
 }

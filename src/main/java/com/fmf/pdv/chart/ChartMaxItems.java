@@ -1,22 +1,20 @@
 package com.fmf.pdv.chart;
 
-import com.fmf.pdv.model.OrderItemChart;
+import com.fmf.pdv.model.ChartValue;
 import java.awt.Dimension;
 import java.util.List;
 import java.util.Locale;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 
 public class ChartMaxItems {
-    public PieDataset createDataset(List<OrderItemChart> orderItems) {
+    public PieDataset createDataset(List<ChartValue> values) {
         DefaultPieDataset dataset = new DefaultPieDataset();
 
-        for (OrderItemChart o: orderItems) {
+        for (ChartValue o: values) {
             dataset.setValue(o.getName(), o.getTotal());
         }
 
@@ -24,12 +22,12 @@ public class ChartMaxItems {
     }
 
     public JFreeChart createPieChart(PieDataset dataset) {
-        JFreeChart jFreeChart = ChartFactory.createPieChart("Produtos mais vendidos", dataset, true, true, Locale.US);
+        JFreeChart jFreeChart = ChartFactory.createPieChart("Produtos mais vendidos", dataset, false, true, Locale.US);
 
         return jFreeChart;
     }
 
-    public ChartPanel createChart(List<OrderItemChart> orderItems) {
+    public ChartPanel createChart(List<ChartValue> orderItems) {
         PieDataset dataset = createDataset(orderItems);
         JFreeChart jFreeChart = createPieChart(dataset);
 
