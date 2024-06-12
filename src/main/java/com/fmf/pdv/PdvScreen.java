@@ -19,6 +19,7 @@ public class PdvScreen extends JFrame {
 
         productDAO = new ProductDAO();
         order = new Order();
+        lbErro.setText("");
         listProducts();
     }
     
@@ -221,8 +222,6 @@ public class PdvScreen extends JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtBarcodeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBarcodeKeyPressed
-        lbErro.setText("");
-
         if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
             String barCode = txtBarcode.getText();
             int quantity = 1;
@@ -236,17 +235,23 @@ public class PdvScreen extends JFrame {
             if (!barCode.isEmpty()) {
                 try {
                     Product product = productDAO.getByBarcode(barCode);
-                    order.addProduct(product, quantity);
 
-                    lbTotal.setText(order.getTotalFormmated());
-                    listProducts();
+                    if (product != null) {
+                        lbErro.setText("");
+                        order.addProduct(product, quantity);
+
+                        lbTotal.setText(order.getTotalFormmated());
+                        listProducts();
+                    } else {
+                        lbErro.setText("Ops! Produto não encontrado");
+                    }
                 } catch (Exception ex) {
                     lbErro.setText("Ops! Produto não encontrado");
                     System.out.println("Erro: " + ex.getMessage());
                 }
-
-                txtBarcode.setText("");
             }
+
+            txtBarcode.setText("");
         }
     }//GEN-LAST:event_txtBarcodeKeyPressed
 
