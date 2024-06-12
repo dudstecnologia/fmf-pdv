@@ -1,5 +1,6 @@
 package com.fmf.pdv.model;
 
+import com.fmf.pdv.util.Helpers;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +32,7 @@ public class Order {
     }
     
     public String getTotalFormmated() {
-        String format = "R$ #,##0.00";
-        DecimalFormat d = new DecimalFormat(format);
-        
-        return d.format(this.getTotal());
+        return Helpers.moneyFormat(this.getTotal());
     }
 
     public void addProduct(Product product, int quantity) {

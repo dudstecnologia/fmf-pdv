@@ -5,6 +5,7 @@ import com.fmf.pdv.model.Order;
 import com.fmf.pdv.model.OrderItem;
 import com.fmf.pdv.model.Product;
 import com.fmf.pdv.model.User;
+import com.fmf.pdv.util.Helpers;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
@@ -31,9 +32,9 @@ public class PdvScreen extends JFrame {
             for (OrderItem item: order.getItems()) {
                 tableModel.addRow(new Object[] {
                     item.getProduct().getName(),
-                    item.getProduct().getPrice(),
+                    Helpers.moneyFormat(item.getProduct().getPrice()),
                     item.getQuantity(),
-                    item.getTotalPrice()
+                    Helpers.moneyFormat(item.getTotalPrice())
                 });
             }
         } catch (Exception ex) {}
@@ -143,15 +144,15 @@ public class PdvScreen extends JFrame {
         tableProducts.setRowHeight(32);
         jScrollPane1.setViewportView(tableProducts);
         if (tableProducts.getColumnModel().getColumnCount() > 0) {
-            tableProducts.getColumnModel().getColumn(1).setMinWidth(120);
-            tableProducts.getColumnModel().getColumn(1).setPreferredWidth(120);
-            tableProducts.getColumnModel().getColumn(1).setMaxWidth(120);
-            tableProducts.getColumnModel().getColumn(2).setMinWidth(90);
-            tableProducts.getColumnModel().getColumn(2).setPreferredWidth(90);
-            tableProducts.getColumnModel().getColumn(2).setMaxWidth(90);
-            tableProducts.getColumnModel().getColumn(3).setMinWidth(120);
-            tableProducts.getColumnModel().getColumn(3).setPreferredWidth(120);
-            tableProducts.getColumnModel().getColumn(3).setMaxWidth(120);
+            tableProducts.getColumnModel().getColumn(1).setMinWidth(150);
+            tableProducts.getColumnModel().getColumn(1).setPreferredWidth(150);
+            tableProducts.getColumnModel().getColumn(1).setMaxWidth(150);
+            tableProducts.getColumnModel().getColumn(2).setMinWidth(100);
+            tableProducts.getColumnModel().getColumn(2).setPreferredWidth(100);
+            tableProducts.getColumnModel().getColumn(2).setMaxWidth(100);
+            tableProducts.getColumnModel().getColumn(3).setMinWidth(200);
+            tableProducts.getColumnModel().getColumn(3).setPreferredWidth(200);
+            tableProducts.getColumnModel().getColumn(3).setMaxWidth(200);
         }
 
         txtQtd.setFont(new java.awt.Font("Arial", 0, 24)); // NOI18N
